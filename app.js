@@ -21,3 +21,5 @@ const launch = async () => {
     console.log(error);
   }
 };
+
+launch();
