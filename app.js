@@ -11,7 +11,13 @@ app.use("/", route);
 app.use(notfoundMiddleware);
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log("And We're LIVE !");
-});
-console.log("Hello There");
+const launch = async () => {
+  try {
+    app.listen(port, () => {
+      console.log("And We're LIVE !");
+    });
+    console.log("Hello There");
+  } catch (error) {
+    console.log(error);
+  }
+};
