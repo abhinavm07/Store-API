@@ -1,9 +1,13 @@
 const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
+
+dotenv.config();
+
 const notfoundMiddleware = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
-const port = 5000;
+const connectDB = require("./db/connect");
+const port = process.env.Port || 5000;
 const route = require("./routes/routeTasks");
 
 app.use("/", route);
@@ -13,6 +17,7 @@ app.use(errorHandler);
 
 const launch = async () => {
   try {
+    await connectDB(process.env.MONGO_URI);
     app.listen(port, () => {
       console.log("And We're LIVE !");
     });
