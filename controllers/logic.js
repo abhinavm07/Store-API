@@ -1,10 +1,10 @@
-const homePage = (req, res) => {
-  res.send("Welcome to the Home Page");
+const homePageStatic = (req, res) => {
+  res.status(200).json({ msg: "Static Data Testing" });
 };
 
 const products = async (req, res) => {
   const storeData = null;
-  res.json({ data: storeData });
+  res.status(200).json({ data: "Products Loading Soon!" });
 };
 
-module.exports = { homePage, products };
+module.exports = { homePageStatic, products };
