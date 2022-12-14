@@ -1,4 +1,5 @@
 const homePageStatic = (req, res) => {
+  throw new Error("Testing Express Async Error package");
   res.status(200).json({ msg: "Static Data Testing" });
 };
 
