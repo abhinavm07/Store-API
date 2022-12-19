@@ -3,7 +3,7 @@ const app = express();
 const dotenv = require("dotenv");
 
 dotenv.config();
-
+// helps to handle asyc errors without using extra middlewares
 require("express-async-errors");
 
 const notfoundMiddleware = require("./middleware/notFound");
@@ -12,6 +12,7 @@ const connectDB = require("./db/connect");
 const port = process.env.Port || 5000;
 const route = require("./routes/routeTasks");
 
+// helps to parse json object from req.body
 app.use(express.json());
 
 app.use("/", route);
