@@ -1,3 +1,4 @@
+const { query } = require("express");
 const productModel = require("../model/products");
 
 const homePage = (req, res) => {
@@ -7,7 +8,7 @@ const homePage = (req, res) => {
 
 const homePageStatic = async (req, res) => {
   // the constant below only takes in featured as input from the query, everything else is ignored
-  const { featured, company } = req.query;
+  const { featured, company, name } = req.query;
   // here we define a new variable to access it down the line
   const queryObj = {};
   if (featured) {
@@ -17,6 +18,10 @@ const homePageStatic = async (req, res) => {
   if (company) {
     queryObj.company = company;
   }
+
+  if (name) {
+    queryObj.name = { $regex: name, $options: "i" };
+  }
   const products = await productModel.find(queryObj);
   // console.log(products);
   res.status(200).json({ msg: products, nbHits: products.length });
@@ -24,7 +29,7 @@ const homePageStatic = async (req, res) => {
 
 const products = async (req, res) => {
   const products = await productModel.find({});
-  res.status(200).json({ data: productData, nbHits: products.length });
+  res.status(200).json({ data: products, nbHits: products.length });
 };
 
 module.exports = { homePage, homePageStatic, products };

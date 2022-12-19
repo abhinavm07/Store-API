@@ -9,7 +9,7 @@ require("express-async-errors");
 const notfoundMiddleware = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
 const connectDB = require("./db/connect");
-const port = process.env.Port || 5000;
+const port = process.env.Port || 8000;
 const route = require("./routes/routeTasks");
 
 // helps to parse json object from req.body
