@@ -8,7 +8,7 @@ const homePage = (req, res) => {
 
 const homePageStatic = async (req, res) => {
   // the constant below only takes in featured as input from the query, everything else is ignored
-  const { featured, company, name } = req.query;
+  const { featured, company, name, sort } = req.query;
   // here we define a new variable to access it down the line
   const queryObj = {};
   if (featured) {
@@ -20,9 +20,19 @@ const homePageStatic = async (req, res) => {
   }
 
   if (name) {
+    //regex le chai name same to same nabhayeni edi data ma search gareko element xa bhanye dekhauxa Example: req.query ma "Abhi" aayo bhanye resunts ma Abhinab, abhii, abhinavv testo aauxa (just "abhi include bha hunu paryo"), option i ko mathlabh case insensative ho
+    //mongoose docs herney confuse bhayema
     queryObj.name = { $regex: name, $options: "i" };
   }
-  const products = await productModel.find(queryObj);
+  let results = productModel.find(queryObj);
+  if (sort) {
+    const sortLst = sort.split(",").join(" ");
+    results = results.sort(sortLst);
+  } else {
+    results = results.sort("createdAt");
+  }
+  const products = await results;
+
   // console.log(products);
   res.status(200).json({ msg: products, nbHits: products.length });
 };
@@ -32,4 +42,12 @@ const products = async (req, res) => {
   res.status(200).json({ data: products, nbHits: products.length });
 };
 
-module.exports = { homePage, homePageStatic, products };
+const deleteEntry = async (req, res) => {
+  const { id: productID } = req.params;
+  const products = await productModel.findByIdAndDelete({ _id: productID });
+  res
+    .status(200)
+    .json({ msg: `Item with id ${productID} deleted Sucessfully` });
+};
+
+module.exports = { homePage, homePageStatic, products, deleteEntry };
