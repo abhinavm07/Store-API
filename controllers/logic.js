@@ -8,7 +8,7 @@ const homePage = (req, res) => {
 
 const homePageStatic = async (req, res) => {
   // the constant below only takes in featured as input from the query, everything else is ignored
-  const { featured, company, name, sort, fields } = req.query;
+  const { featured, company, name, sort, fields, numericFilters } = req.query;
   // here we define a new variable to access it down the line
   const queryObj = {};
   if (featured) {
@@ -23,6 +23,30 @@ const homePageStatic = async (req, res) => {
     //regex le chai name same to same nabhayeni edi data ma search gareko element xa bhanye dekhauxa Example: req.query ma "Abhi" aayo bhanye resunts ma Abhinab, abhii, abhinavv testo aauxa (just "abhi include bha hunu paryo"), option i ko mathlabh case insensative ho
     //mongoose docs herney confuse bhayema
     queryObj.name = { $regex: name, $options: "i" };
+  }
+
+  if (numericFilters) {
+    const operatorMap = {
+      ">": "$gt",
+      ">=": "$gte",
+      "=": "$eq",
+      "<": "$lt",
+      "<=": "$lte",
+    };
+    const regEx = /\b(<|>|>=|=|<|<=)\b/g;
+    let filters = numericFilters.replace(
+      regEx,
+      (match) => `-${operatorMap[match]}-`
+    );
+    console.log(filters);
+    const options = ["price", "featured"];
+    filters = filters.split(",").forEach((item) => {
+      const [fields, operator, value] = item.split("-");
+      if (options.includes(fields)) {
+        queryObj[fields] = { [operator]: Number(value) };
+      }
+    });
+    console.log(queryObj);
   }
   let results = productModel.find(queryObj);
   if (sort) {
@@ -51,7 +75,10 @@ const homePageStatic = async (req, res) => {
 };
 
 const products = async (req, res) => {
-  const products = await productModel.find({});
+  const products = await productModel
+    .find({ price: { $gt: 30 } })
+    .sort("price")
+    .select("name price");
   res.status(200).json({ data: products, nbHits: products.length });
 };
 
