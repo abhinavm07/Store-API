@@ -24,7 +24,6 @@ const homePageStatic = async (req, res) => {
     //mongoose docs herney confuse bhayema
     queryObj.name = { $regex: name, $options: "i" };
   }
-
   if (numericFilters) {
     const operatorMap = {
       ">": "$gt",
@@ -38,12 +37,11 @@ const homePageStatic = async (req, res) => {
       regEx,
       (match) => `-${operatorMap[match]}-`
     );
-    console.log(filters);
-    const options = ["price", "featured"];
+    const options = ["price", "rating"];
     filters = filters.split(",").forEach((item) => {
-      const [fields, operator, value] = item.split("-");
-      if (options.includes(fields)) {
-        queryObj[fields] = { [operator]: Number(value) };
+      const [field, operator, value] = item.split("-");
+      if (options.includes(field)) {
+        queryObj[field] = { [operator]: Number(value) };
       }
     });
     console.log(queryObj);
