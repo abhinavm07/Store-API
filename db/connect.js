@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", true);
 
+//Database connection
 const db = (url) => {
   mongoose
     .connect(url, {

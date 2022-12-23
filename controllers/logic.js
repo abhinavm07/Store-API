@@ -6,7 +6,7 @@ const homePage = (req, res) => {
   res.status(200).json({ msg: "Good Job Man ! You're Doing Great" });
 };
 
-const homePageStatic = async (req, res) => {
+const products = async (req, res) => {
   // the constant below only takes in featured as input from the query, everything else is ignored
   const { featured, company, name, sort, fields, numericFilters } = req.query;
   // here we define a new variable to access it down the line
@@ -24,30 +24,42 @@ const homePageStatic = async (req, res) => {
     //mongoose docs herney confuse bhayema
     queryObj.name = { $regex: name, $options: "i" };
   }
+
+  //Documentation Necessay
   if (numericFilters) {
+    //to convert input taken from user into mongoose filters to filter data from database
     const operatorMap = {
-      ">": "$gt",
-      ">=": "$gte",
-      "=": "$eq",
-      "<": "$lt",
-      "<=": "$lte",
+      ">": "$gt", //greater than
+      ">=": "$gte", //greater than equal to
+      "=": "$eq", //equals to
+      "<": "$lt", //less than
+      "<=": "$lte", //less than equal to
     };
+    //\b is a zero width assertion. That means it does not match a character, it matches a position with one thing on the left side and another thing on the right side.
     const regEx = /\b(<|>|>=|=|<|<=)\b/g;
+    //filter replaces expression matched from regex with the corresponding value in operator map.
     let filters = numericFilters.replace(
       regEx,
-      (match) => `-${operatorMap[match]}-`
+      (match) => `-${operatorMap[match]}-` //match is a callback function which returns matched value from the object
     );
+    //options are the only ons for which we can use numeric filter (since they are the only ones which have numeric values)
     const options = ["price", "rating"];
+    //here the filter splits the query with the , and gives us two expressions
+    // and for each item  it assigns value that has been split with field, operator and value from the expression before or after "-"
     filters = filters.split(",").forEach((item) => {
       const [field, operator, value] = item.split("-");
+      //here if the field provided is included in options than example queryObj[price] ={[$gt]:Number(40)}
       if (options.includes(field)) {
+        //operator big brackett ma halena bhanye value lidaina
         queryObj[field] = { [operator]: Number(value) };
+        console.log(operator);
       }
     });
     console.log(queryObj);
   }
   let results = productModel.find(queryObj);
   if (sort) {
+    // .sort helps us to sort data inorder according to the users input
     const sortLst = sort.split(",").join(" ");
     results = results.sort(sortLst);
   } else {
@@ -56,6 +68,7 @@ const homePageStatic = async (req, res) => {
 
   if (fields) {
     const fieldsLst = fields.split(",").join(" ");
+    //.select only returns the values of the fields provided from the user
     results = results.select(fieldsLst);
   }
 
@@ -65,6 +78,8 @@ const homePageStatic = async (req, res) => {
   const limit = Number(req.query.limit) || 10;
 
   const skip = (page - 1) * limit;
+
+  //.skip skips the number of items while .limit limits a number of outcomes to come from the database
   results = results.skip(skip).limit(limit);
   const products = await results;
 
@@ -72,8 +87,9 @@ const homePageStatic = async (req, res) => {
   res.status(200).json({ msg: products, nbHits: products.length });
 };
 
-const products = async (req, res) => {
+const homePageStatic = async (req, res) => {
   const products = await productModel
+    //find helps us find an item in a static db
     .find({ price: { $gt: 30 } })
     .sort("price")
     .select("name price");

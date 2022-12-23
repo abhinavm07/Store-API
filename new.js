@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+//to populate empty database while testing
 const productSchema = new mongoose.Schema({
   name: {
     type: String,

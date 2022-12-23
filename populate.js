@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+// to push static data to database
+
 const connectDB = require("./db/connect");
 const productSchema = require("./model/products");
 const products = require("./product.json");
